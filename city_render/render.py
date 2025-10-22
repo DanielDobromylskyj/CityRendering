@@ -2,6 +2,14 @@ import numpy as np
 import trimesh
 import pyrender
 from PIL import Image
+import importlib.resources as resources
+
+
+with resources.files("city_render").joinpath("assets/road.stl").open("rb") as f:
+    ROAD_TRIMESH = trimesh.load_mesh(f, "stl")
+
+ROAD_VERTICAL = pyrender.Mesh.from_trimesh(ROAD_TRIMESH)
+
 
 
 
@@ -45,11 +53,14 @@ def render_city(city, filename="city_render.png", size=50):
         scene.add(mesh)
 
         # Add Roads
-        for (dx1, dy1, dx2, dy2) in ((0, 0, 0, 1), (0, 0, 1, 0), (1, 0, 1, 1), (0, 1, 1, 1)):
+        for (dx1, dy1, dx2, dy2, is_vertical) in ((0, 0, 0, 1, True), (0, 0, 1, 0, False),
+                                                  (1, 0, 1, 1, True), (0, 1, 1, 1, False)):
             tx1, ty1, tx2, ty2 = (x + dx1), (y + dy1), (x + dx2), (y + dy2)
 
             if (tx1, ty1, tx2, ty2) not in roads:
-
+                if is_vertical:
+                    # ROAD_VERTICAL = pyrender.Mesh.from_trimesh(ROAD_TRIMESH)
+                    pass
 
                 roads.append((tx1, ty1, tx2, ty2))
 
